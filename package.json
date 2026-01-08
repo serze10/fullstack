@@ -1,0 +1,7 @@
+{
+  "name": "fullstack",
+  "version": "1.0.0",
+  "scripts": {
+    "install-all": "cd osa3/notebackend && npm install && cd ../../osa2/kokrende && npm install"
+  }
+}
