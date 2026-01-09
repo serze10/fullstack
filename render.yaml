@@ -1,7 +1,12 @@
 services:
   - type: web
     name: fullstack
-    buildCommand: cd osa2/kokrende && npm install && npm run build && cd ../../osa3/notebackend && npm install
+    buildCommand: |
+      cd osa2/kokrende
+      npm install
+      npm run build
+      cd ../../osa3/notebackend
+      npm install
     startCommand: cd osa3/notebackend && node index.js
     envVars:
       - key: NODE_ENV
