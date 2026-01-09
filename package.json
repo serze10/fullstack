@@ -2,7 +2,7 @@
   "name": "fullstack",
   "version": "1.0.0",
   "scripts": {
-    "build:ui": "cd part2-notes-frontend && npm install && npm run build && cp -r dist ../part3-notes-backend/",
+    "build:ui": "cd part2-notes-frontend && npm install && npm run build && cp -r dist ../part3-notes-backend/ && cd ../part3-notes-backend && npm install",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
     "start": "cd part3-notes-backend && node index.js"
   }
