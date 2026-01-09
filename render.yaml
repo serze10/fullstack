@@ -3,15 +3,15 @@ services:
     name: fullstack
     buildCommand: |
       echo "Building frontend..."
-      cd osa2/kokrende
+      cd part2-notes-frontend
       npm install
       npm run build
       echo "Copying frontend to backend..."
-      cp -r dist ../../osa3/notebackend/
+      cp -r dist ../part3-notes-backend/
       echo "Installing backend dependencies..."
-      cd ../../osa3/notebackend
+      cd ../part3-notes-backend
       npm install
-    startCommand: cd osa3/notebackend && node index.js
+    startCommand: cd part3-notes-backend && node index.js
     envVars:
       - key: NODE_ENV
         value: production

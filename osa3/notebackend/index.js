@@ -2,12 +2,17 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const path = require('path')
+const fs = require('fs')
 
 app.use(express.json())
 app.use(cors())
 
 // Serve static files from frontend build
-app.use(express.static('dist'))
+// Try local copy first (Render), then fallback to original location (local dev)
+const distPath = path.join(__dirname, 'dist')
+const distPathLocal = path.join(__dirname, '../../osa2/kokrende/dist')
+const staticPath = fs.existsSync(distPath) ? distPath : distPathLocal
+app.use(express.static(staticPath))
 
 let notes = [
   {
@@ -91,7 +96,8 @@ app.delete('/api/notes/:id', (request, response) => {
 app.use((req, res, next) => {
   if (req.method !== 'GET') return next()
   if (req.path.startsWith('/api')) return next()
-  res.sendFile(path.join(__dirname, 'dist/index.html'))
+  const indexPath = fs.existsSync(distPath) ? path.join(distPath, 'index.html') : path.join(distPathLocal, 'index.html')
+  res.sendFile(indexPath)
 })
 
 const unknownEndpoint = (request, response) => {
