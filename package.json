@@ -2,7 +2,8 @@
   "name": "fullstack",
   "version": "1.0.0",
   "scripts": {
-    "install-all": "cd osa3/notebackend && npm install && cd ../../osa2/kokrende && npm install",
-    "start": "cd osa3/notebackend && npm start"
+    "build:ui": "cd part2-notes-frontend && npm install && npm run build && cp -r dist ../part3-notes-backend/",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "start": "cd part3-notes-backend && node index.js"
   }
 }
