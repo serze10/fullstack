@@ -1,20 +1,9 @@
 services:
   - type: web
-    name: notebackend
-    dir: osa3/notebackend
-    buildCommand: npm install
-    startCommand: npm start
+    name: fullstack
+    buildCommand: cd osa2/kokrende && npm install && npm run build && cd ../../osa3/notebackend && npm install
+    startCommand: cd osa3/notebackend && npm start
+    staticSite: false
     envVars:
       - key: NODE_ENV
         value: production
-
-  - type: web
-    name: notefrontend
-    dir: osa2/kokrende
-    buildCommand: npm install && npm run build
-    startCommand: npm run preview
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: VITE_API_URL
-        value: https://notebackend.onrender.com

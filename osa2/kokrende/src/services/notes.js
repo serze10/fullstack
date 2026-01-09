@@ -1,7 +1,5 @@
 import axios from 'axios'
-const baseUrl = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL}/api/notes`
-  : 'http://localhost:3001/api/notes'
+const baseUrl = '/api/notes'
 
 /*
 const getAll = () => {

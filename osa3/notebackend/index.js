@@ -5,6 +5,9 @@ const cors = require('cors')
 app.use(express.json())
 app.use(cors())
 
+// Serve static files from frontend build
+app.use(express.static('../osa2/kokrende/dist'))
+
 let notes = [
   {
     id: "1",
@@ -83,13 +86,18 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end()
 })
 
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
-
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
+
+// Fallback to index.html for SPA routing
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/../osa2/kokrende/dist/index.html')
+})
+
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
