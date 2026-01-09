@@ -2,9 +2,13 @@ services:
   - type: web
     name: fullstack
     buildCommand: |
+      echo "Building frontend..."
       cd osa2/kokrende
       npm install
       npm run build
+      echo "Copying frontend to backend..."
+      cp -r dist ../../osa3/notebackend/
+      echo "Installing backend dependencies..."
       cd ../../osa3/notebackend
       npm install
     startCommand: cd osa3/notebackend && node index.js

@@ -7,7 +7,7 @@ app.use(express.json())
 app.use(cors())
 
 // Serve static files from frontend build
-app.use(express.static(path.join(__dirname, '../../osa2/kokrende/dist')))
+app.use(express.static('dist'))
 
 let notes = [
   {
@@ -91,7 +91,7 @@ app.delete('/api/notes/:id', (request, response) => {
 app.use((req, res, next) => {
   if (req.method !== 'GET') return next()
   if (req.path.startsWith('/api')) return next()
-  res.sendFile(path.join(__dirname, '../../osa2/kokrende/dist/index.html'))
+  res.sendFile(path.join(__dirname, 'dist/index.html'))
 })
 
 const unknownEndpoint = (request, response) => {
