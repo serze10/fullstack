@@ -1,12 +1,13 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const path = require('path')
 
 app.use(express.json())
 app.use(cors())
 
 // Serve static files from frontend build
-app.use(express.static('../../osa2/kokrende/dist'))
+app.use(express.static(path.join(__dirname, '../../osa2/kokrende/dist')))
 
 let notes = [
   {
@@ -86,13 +87,12 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end()
 })
 
-// Fallback to index.html for SPA routing (must be before unknownEndpoint)
-app.use((req, res, next) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(__dirname + '/../../osa2/kokrende/dist/index.html')
-  } else {
-    next()
-  }
+// Fallback to index.html for SPA routing (after API routes, before 404)
+app.get('/*', (req, res, next) => {
+  if (req.method !== 'GET') return next()
+  if (req.path.startsWith('/api')) return next()
+  if (path.extname(req.path)) return next()
+  res.sendFile(path.join(__dirname, '../../osa2/kokrende/dist/index.html'))
 })
 
 const unknownEndpoint = (request, response) => {
