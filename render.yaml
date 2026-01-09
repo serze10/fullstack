@@ -15,3 +15,11 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
+  - type: web
+    name: puhelinluettelo-backend
+    buildCommand: cd osa3/puhelinluettelonbackend && npm install
+    startCommand: cd osa3/puhelinluettelonbackend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
