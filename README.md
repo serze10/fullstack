@@ -3,7 +3,7 @@
 ## Deployed Applications
 
 ### Notes Application
-Frontend + Backend: https://fullstack-h0nj.onrender.com
+https://fullstack-h0nj.onrender.com
 
 ### Phonebook Backend
-Backend API: https://puhelinluettelo-backend-1de4.onrender.com/
+https://puhelinluettelo-backend-1de4.onrender.com/
