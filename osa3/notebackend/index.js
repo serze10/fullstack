@@ -6,7 +6,7 @@ app.use(express.json())
 app.use(cors())
 
 // Serve static files from frontend build
-app.use(express.static('../osa2/kokrende/dist'))
+app.use(express.static('../../osa2/kokrende/dist'))
 
 let notes = [
   {
@@ -94,7 +94,7 @@ app.use(unknownEndpoint)
 
 // Fallback to index.html for SPA routing
 app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/../osa2/kokrende/dist/index.html')
+  res.sendFile(__dirname + '/../../osa2/kokrende/dist/index.html')
 })
 
 const PORT = process.env.PORT || 3001

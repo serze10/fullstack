@@ -1,9 +1,9 @@
 services:
   - type: web
     name: fullstack
-    buildCommand: cd osa2/kokrende && npm install && npm run build && cd ../../osa3/notebackend && npm install
-    startCommand: cd osa3/notebackend && npm start
-    staticSite: false
+    dir: osa3/notebackend
+    buildCommand: npm install && cd ../kokrende && npm install && npm run build && cd ../notebackend
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
