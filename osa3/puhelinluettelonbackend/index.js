@@ -1,10 +1,18 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const path = require('path')
+const fs = require('fs')
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+// Serve static files from frontend build
+const distPath = path.join(__dirname, 'dist')
+const distPathLocal = path.join(__dirname, '../../osa2/puhelinluettelo/dist')
+const staticPath = fs.existsSync(distPath) ? distPath : distPathLocal
+app.use(express.static(staticPath))
 
 morgan.token('body', (request, response) => {
   return JSON.stringify(request.body)
@@ -35,15 +43,11 @@ let persons = [
     }
 ]
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
-
 app.get('/api/persons', (request, response) => {
   response.json(persons)
 })
 
-app.get('/info', (request, response) => {
+app.get('/api/info', (request, response) => {
   response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
 })
 
@@ -91,6 +95,13 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
+// Fallback to index.html for SPA routing
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next()
+  if (req.path.startsWith('/api')) return next()
+  const indexPath = fs.existsSync(distPath) ? path.join(distPath, 'index.html') : path.join(distPathLocal, 'index.html')
+  res.sendFile(indexPath)
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

@@ -18,7 +18,7 @@ services:
 
   - type: web
     name: puhelinluettelo-backend
-    buildCommand: cd osa3/puhelinluettelonbackend && npm install
+    buildCommand: cd osa2/puhelinluettelo && npm install && npm run build && cp -r dist ../../osa3/puhelinluettelonbackend/ && cd ../../osa3/puhelinluettelonbackend && npm install
     startCommand: cd osa3/puhelinluettelonbackend && npm start
     envVars:
       - key: NODE_ENV

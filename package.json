@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build:ui": "cd part2-notes-frontend && npm install && npm run build && cp -r dist ../part3-notes-backend/ && cd ../part3-notes-backend && npm install",
+    "build:phonebook": "cd osa2/puhelinluettelo && npm install && npm run build && cp -r dist ../../osa3/puhelinluettelonbackend/",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "deploy:phonebook": "npm run build:phonebook && git add . && git commit -m phonebook-ui && git push",
     "start": "cd part3-notes-backend && node index.js"
   }
 }
