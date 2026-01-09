@@ -86,16 +86,20 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end()
 })
 
+// Fallback to index.html for SPA routing (must be before unknownEndpoint)
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(__dirname + '/../../osa2/kokrende/dist/index.html')
+  } else {
+    next()
+  }
+})
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
-
-// Fallback to index.html for SPA routing
-app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/../../osa2/kokrende/dist/index.html')
-})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
