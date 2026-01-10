@@ -7,5 +7,8 @@
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
     "deploy:phonebook": "npm run build:phonebook && git add . && git commit -m phonebook-ui && git push",
     "start": "cd part3-notes-backend && node index.js"
+  },
+  "dependencies": {
+    "mongoose": "^9.1.2"
   }
 }
