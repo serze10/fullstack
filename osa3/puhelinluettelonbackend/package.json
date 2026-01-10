@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Santeri Silvennoinen",
@@ -16,5 +17,8 @@
     "express": "^5.2.1",
     "mongoose": "^9.1.2",
     "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.7.0"
   }
 }

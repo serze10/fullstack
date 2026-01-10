@@ -16,7 +16,7 @@ const distPathLocal = path.join(__dirname, '../../osa2/puhelinluettelo/dist')
 const staticPath = fs.existsSync(distPath) ? distPath : distPathLocal
 app.use(express.static(staticPath))
 
-morgan.token('body', (request, response) => {
+morgan.token('body', (request) => {
   return JSON.stringify(request.body)
 })
 
@@ -48,7 +48,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -56,18 +56,18 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
-  
+
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'name or number missing' 
+    return response.status(400).json({
+      error: 'name or number missing'
     })
   }
-  
+
   const person = new Person({
     name: body.name,
     number: body.number,
   })
-  
+
   person.save()
     .then(savedPerson => {
       response.json(savedPerson)
