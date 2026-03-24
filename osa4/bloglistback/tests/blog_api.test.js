@@ -33,6 +33,27 @@ test('blog has id field and not _id', async () => {
   assert(!response.body[0]._id)
 })
 
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'Async patterns in Node.js',
+    author: 'Jane Doe',
+    url: 'https://asyncpatterns.dev',
+    likes: 3,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+  const titles = blogsAtEnd.map(n => n.title)
+  assert(titles.includes('Async patterns in Node.js'))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
