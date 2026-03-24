@@ -9,16 +9,20 @@ const app = express()
 
 mongoose.set('strictQuery', false)
 
-logger.info('connecting to', config.MONGODB_URI)
-
-mongoose
-  .connect(config.MONGODB_URI, { family: 4 })
-  .then(() => {
+const connectDB = async () => {
+  try {
+    logger.info('connecting to', config.MONGODB_URI)
+    await mongoose.connect(config.MONGODB_URI, { family: 4, serverSelectionTimeoutMS: 5000 })
     logger.info('connected to MongoDB')
-  })
-  .catch((error) => {
+  } catch (error) {
     logger.error('error connecting to MongoDB:', error.message)
-  })
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1)
+    }
+  }
+}
+
+connectDB()
 
 app.use(express.static('dist'))
 app.use(express.json())
