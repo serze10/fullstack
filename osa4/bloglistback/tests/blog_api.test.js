@@ -106,6 +106,48 @@ describe('when there are initially some blogs saved', () => {
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
     })
   })
+
+  describe('deletion of a blog', () => {
+    test('succeeds with status code 204 if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+
+      const ids = blogsAtEnd.map(b => b.id)
+      assert(!ids.includes(blogToDelete.id))
+
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+    })
+  })
+
+  describe('updating a blog', () => {
+    test('succeeds in updating likes of an existing blog', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToUpdate = blogsAtStart[0]
+
+      const updatedBlog = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1,
+      }
+
+      const response = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      assert.strictEqual(response.body.likes, blogToUpdate.likes + 1)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const changedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+      assert.strictEqual(changedBlog.likes, blogToUpdate.likes + 1)
+    })
+  })
 })
 
 after(async () => {
