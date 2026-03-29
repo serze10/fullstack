@@ -2,16 +2,36 @@ const assert = require('node:assert')
 const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcryptjs')
 const app = require('../app')
 const helper = require('./test_helper')
 const Note = require('../models/note')
+const User = require('../models/user')
 
 const api = supertest(app)
+let token
 
 describe('when there is initially some notes saved', () => {
   beforeEach(async () => {
     await Note.deleteMany({})
-    await Note.insertMany(helper.initialNotes)
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', name: 'Superuser', passwordHash })
+    const savedUser = await user.save()
+
+    const notesWithUser = helper.initialNotes.map(note => ({
+      ...note,
+      user: savedUser._id,
+    }))
+
+    await Note.insertMany(notesWithUser)
+
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'sekret' })
+
+    token = loginResponse.body.token
   })
 
   test('notes are returned as json', async () => {
@@ -44,7 +64,10 @@ describe('when there is initially some notes saved', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      assert.deepStrictEqual(resultNote.body, noteToView)
+      assert.strictEqual(resultNote.body.id, noteToView.id)
+      assert.strictEqual(resultNote.body.content, noteToView.content)
+      assert.strictEqual(resultNote.body.important, noteToView.important)
+      assert.strictEqual(resultNote.body.user, noteToView.user.toString())
     })
 
     test('fails with statuscode 404 if note does not exist', async () => {
@@ -69,6 +92,7 @@ describe('when there is initially some notes saved', () => {
 
       await api
         .post('/api/notes')
+        .set('Authorization', `Bearer ${token}`)
         .send(newNote)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -83,7 +107,11 @@ describe('when there is initially some notes saved', () => {
     test('fails with status code 400 if data invalid', async () => {
       const newNote = { important: true }
 
-      await api.post('/api/notes').send(newNote).expect(400)
+      await api
+        .post('/api/notes')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newNote)
+        .expect(400)
 
       const notesAtEnd = await helper.notesInDb()
 

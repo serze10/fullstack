@@ -7,15 +7,18 @@
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development node --watch index.js",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test node --test"
+    "test": "cross-env NODE_ENV=test SECRET=testsecret node --test --test-concurrency=1"
   },
   "author": "Santeri Silvennoinen",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

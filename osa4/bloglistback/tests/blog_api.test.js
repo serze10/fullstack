@@ -2,16 +2,31 @@ const { test, beforeEach, after, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcryptjs')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', name: 'Superuser', passwordHash })
+    const savedUser = await user.save()
+
+    const blogsWithUser = helper.initialBlogs.map(blog => ({
+      ...blog,
+      user: savedUser._id,
+    }))
+
+    const savedBlogs = await Blog.insertMany(blogsWithUser)
+    savedUser.blogs = savedBlogs.map(blog => blog._id)
+    await savedUser.save()
   })
 
   describe('fetching blogs', () => {
@@ -26,6 +41,14 @@ describe('when there are initially some blogs saved', () => {
       const response = await api.get('/api/blogs')
 
       assert.strictEqual(response.body.length, helper.initialBlogs.length)
+    })
+
+    test('blog creator is populated', async () => {
+      const response = await api.get('/api/blogs')
+
+      assert(response.body[0].user)
+      assert(response.body[0].user.username)
+      assert(response.body[0].user.name)
     })
 
     test('blog has id field and not _id', async () => {
@@ -146,6 +169,20 @@ describe('when there are initially some blogs saved', () => {
       const blogsAtEnd = await helper.blogsInDb()
       const changedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
       assert.strictEqual(changedBlog.likes, blogToUpdate.likes + 1)
+    })
+  })
+
+  describe('users listing', () => {
+    test('shows blogs created by user', async () => {
+      const response = await api
+        .get('/api/users')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      assert.strictEqual(response.body.length, 1)
+      assert(response.body[0].blogs)
+      assert.strictEqual(response.body[0].blogs.length, helper.initialBlogs.length)
+      assert(response.body[0].blogs[0].title)
     })
   })
 })
