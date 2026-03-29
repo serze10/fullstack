@@ -9,6 +9,8 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 const api = supertest(app)
+let token
+let userId
 
 describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
@@ -18,6 +20,7 @@ describe('when there are initially some blogs saved', () => {
     const passwordHash = await bcrypt.hash('sekret', 10)
     const user = new User({ username: 'root', name: 'Superuser', passwordHash })
     const savedUser = await user.save()
+    userId = savedUser._id.toString()
 
     const blogsWithUser = helper.initialBlogs.map(blog => ({
       ...blog,
@@ -27,6 +30,12 @@ describe('when there are initially some blogs saved', () => {
     const savedBlogs = await Blog.insertMany(blogsWithUser)
     savedUser.blogs = savedBlogs.map(blog => blog._id)
     await savedUser.save()
+
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'sekret' })
+
+    token = loginResponse.body.token
   })
 
   describe('fetching blogs', () => {
@@ -70,6 +79,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -79,6 +89,26 @@ describe('when there are initially some blogs saved', () => {
 
       const titles = blogsAtEnd.map(n => n.title)
       assert(titles.includes('Async patterns in Node.js'))
+
+      const addedBlog = blogsAtEnd.find(blog => blog.title === 'Async patterns in Node.js')
+      assert.strictEqual(addedBlog.user.toString(), userId)
+    })
+
+    test('blog is not added without token', async () => {
+      const newBlog = {
+        title: 'No Token Blog',
+        author: 'Unauthorized',
+        url: 'https://notoken.dev',
+        likes: 1,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
     })
 
     test('if likes is missing, it defaults to 0', async () => {
@@ -90,6 +120,7 @@ describe('when there are initially some blogs saved', () => {
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -106,6 +137,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
 
@@ -122,6 +154,7 @@ describe('when there are initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
 
