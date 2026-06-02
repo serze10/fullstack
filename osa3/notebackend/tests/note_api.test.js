@@ -88,7 +88,7 @@ describe('when there is initially some notes saved', () => {
       const newNote = {
         content: 'async/await simplifies making async calls',
         important: true,
-      }
+        }
 
       await api
         .post('/api/notes')
